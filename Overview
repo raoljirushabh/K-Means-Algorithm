@@ -1,0 +1,536 @@
+
+
+
+
+Problem overview
+Based on the dataset of delivery fleet driver data, drivers can be grouped into clusters on
+the basis of two features:-       
+mean distance driven per day;
+the mean percentage of time a driver was > 5 mph over the speed limit;
+Dividing drivers into clusters by these criteria will separate speeding drivers from those who follow speed limits, in addition
+to the rural vs. urban divide. 
+In this work the data is grouped using K-Means algorithm that is an unsupervised machine
+learning algorithm. The main idea of this algorithm is to calculate the center
+of each K-cluster and then label all the data with appropriate cluster. K-Means
+algorithm includes following steps:
+randomly pick centroids (cluster centers). The number of clusters is defined by K;
+assign each object to the closest centroid based on the distance. In this work distance implies Euclidian distance that is
+defined by formula 
+(1): (1) where and two points in Euclidian n-space (in our case n = 2 because we have two features); recalculate the position of K centroids based
+on the mean value of all points; repeat previous steps until there is no
+change in clusters or centroids don’t move; 
+Right division into clusters helps to understand the insights of
+the data and facilitating further data analysis and making decisions. To identify optimal number of clusters
+squared error function (2) was used:
+(2) where – number of clusters, n - number of drivers, data
+point, centroid for cluster j, distance function.
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+Solution Code
+
+import matplotlib.pyplot as plt
+
+import pandas as pd
+
+import numpy as np
+
+from sklearn.cluster import KMeans
+
+
+
+color_map = {}
+
+
+
+
+
+def main():
+
+    end_program = 'no'
+
+    print()
+
+    while end_program == 'no':
+
+        k = input_k()
+
+        drivers_matrix = input_data()
+
+        kmeans = kmeans_alg(drivers_matrix, k)
+
+        save_results_pic(drivers_matrix, kmeans, k)
+
+        # Calculate error
+
+        print("For k = {} squared error value is {}".format(k, round(error_func(drivers_matrix, kmeans.cluster_centers_, kmeans.labels_))))
+
+        end_program = input('Do you want to end program? (Enter no to continue): ')
+
+
+
+def input_k():
+
+    # input number of clusters
+
+    while True:
+
+        try:
+
+            k = int(input("Please specify k: "))
+
+            global color_map
+
+            for i in range(k+1):
+
+                color_map[i] = np.random.random(3)
+
+            break
+
+        except ValueError:
+
+            print("Entered value is not correct. Please, enter correct value")
+
+    return k
+
+
+
+
+
+def input_data():
+
+    # creating data frame from input file
+
+    drivers_data_frame = pd.read_csv('drivers_dataset.txt', '\t')
+
+
+
+    # Get columns from drivers data frame
+
+    distance_feature = drivers_data_frame['Distance_Feature'].values
+
+    speeding_feature = drivers_data_frame['Speeding_Feature'].values
+
+
+
+    # Create matrix 2x2 from drivers data
+
+    drivers_matrix = np.matrix(list(zip(distance_feature, speeding_feature)))
+
+    return drivers_matrix
+
+
+
+
+
+def kmeans_alg(drivers_matrix, k):
+
+    # Kmeans algorithm
+
+    kmeans = KMeans(n_clusters=k).fit(drivers_matrix)
+
+    return kmeans
+
+
+
+
+
+def save_results_pic(drivers_matrix, kmeans, k):
+
+    plt.scatter([drivers_matrix[:, 0]], [drivers_matrix[:, 1]], c=[color_map[l] for l in kmeans.labels_], s=5)
+
+    plt.show()
+
+    plt.savefig('clusters_k{}.png'.format(k))
+
+
+
+
+
+def error_func(drivers_matrix, clusters_centers, lables):
+
+
+
+    k = len(clusters_centers)
+
+    n = len(drivers_matrix)
+
+    total_error = 0
+
+
+
+    for j in range(k):
+
+        sum_error = 0
+
+        for i in range(n):
+
+            if lables[i] == j:
+
+                sum_error += np.linalg.norm(drivers_matrix[i, :] - clusters_centers[j, :]) ** 2
+
+        total_error += sum_error
+
+
+
+    return total_error
+
+
+
+main()
+
+
+
+
+
+
+#Run the program
+Steps
+
+ 
+
+
+
+Please specify k:
+2
+
+
+
+For k = 2 squared
+error value is 1316421.0
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+ 
+
+
+
+Please specify k:
+4
+
+
+
+For k = 4 squared
+error value is 719602.0
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+6
+
+
+
+For k = 6 squared
+error value is 372836.0
+
+
+
+ 
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+8
+
+
+
+For k = 8 squared
+error value is 276909.0
+
+
+
+
+
+ 
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+10
+
+
+
+For k = 10
+squared error value is 230657.0
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+12
+
+
+
+For k = 12
+squared error value is 189353.0
+
+
+
+
+
+ 
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+14
+
+
+
+For k = 14
+squared error value is 166308.0
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+16
+
+
+
+For k = 16
+squared error value is 139520.0
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+18
+
+
+
+For k = 18 squared
+error value is 126042.0
+
+
+
+ 
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+20
+
+
+
+For k = 20
+squared error value is 114658.0
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+22
+
+
+
+For k = 22
+squared error value is 105158.0
+
+
+
+ 
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+24
+
+
+
+For k = 24
+squared error value is 98467.0
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+26
+
+
+
+For k = 26
+squared error value is 89990.0
+
+
+
+ 
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+28
+
+
+
+For k = 28
+squared error value is 84176.0
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): no
+
+
+
+Please specify k:
+30
+
+
+
+For k = 30
+squared error value is 78735.0
+
+
+
+
+
+Do you want to
+end program? (Enter no to continue): yes
+
+
+
+ 
+
+
+
+Libraries
+and Packages
+
+      
+import matplotlib.pyplot as plt : Each pyplot function make changes to a diagram/figure i.e. creates a
+plotting area in a figure, a figure, decorates the plot with labels, plots some
+lines in a plotting area. It also preserves the state of the function, also it
+keeps the track of the plotting area and current figure, etc.
+
+
+     
+import pandas as pd : It stands for “Python Data Analysis Library”. It is used to import a
+data and create the object of it. The object created by panda library is
+usually having rows and columns knows as Data Frame. Data Frames usually are
+easier to handle whilst the analytics instead of Lists and Dictionaries.
+
+
+     
+Import numpy as np: This is library used for scientific computing with Python. It contains a
+powerful N-dimensional array object, useful linear algebra, Fourier transform,
+and random number capabilities, useful mathematical functions, can also be used
+as multi-dimensional data container. It defines arbitrary data types. 
+
+
+   
+from sklearn.cluster import KMeans: It imports the K-Means algorithm, also divides the data and
+clusters into ‘n’ groups of equal variance, minimizing a criterion known as the
+inertia.
+
+
+
+
+
+
+
+ 
+
+Conclusions
+
+
+
+The value of squared error function for different K is plotted on Fig.1. From this graphic it is
+clear that the "elbow point" is for K=12. So, K=12
+is the point where no further dramatic improvements happen and therefore, K=12
+can be considered as optimal value for current dataset.
+
+
+
